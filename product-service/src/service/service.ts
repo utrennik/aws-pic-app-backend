@@ -1,6 +1,6 @@
 import { IProduct } from './../models/types';
 import { NotFoundError } from '../errors/notFoundError';
-import products from '@/mocks/products';
+import products from '../mocks/products';
 
 const getAll = async () => {
   return products;

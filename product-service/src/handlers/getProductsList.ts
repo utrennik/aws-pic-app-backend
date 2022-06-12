@@ -1,4 +1,4 @@
-import { getAll } from '@service';
+import { getAll } from '../service/service';
 import { IProduct } from '../models/types';
 
 const getProductsList = async (event: any) => {
