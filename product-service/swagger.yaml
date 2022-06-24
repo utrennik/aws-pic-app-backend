@@ -1,0 +1,56 @@
+---
+swagger: '2.0'
+info:
+  version: '2022-06-12T13:44:36Z'
+  title: 'dev-product-service'
+host: 'jdr8r8f7m1.execute-api.eu-west-1.amazonaws.com'
+basePath: '/dev'
+schemes:
+  - 'https'
+paths:
+  /products:
+    get:
+      responses: {}
+    options:
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'
+      responses:
+        '200':
+          description: '200 response'
+          headers:
+            Access-Control-Allow-Origin:
+              type: 'string'
+            Access-Control-Allow-Methods:
+              type: 'string'
+            Access-Control-Allow-Headers:
+              type: 'string'
+  /products/{productId}:
+    get:
+      parameters:
+        - name: 'productId'
+          in: 'path'
+          required: true
+          type: 'string'
+      responses: {}
+    options:
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'
+      parameters:
+        - name: 'productId'
+          in: 'path'
+          required: true
+          type: 'string'
+      responses:
+        '200':
+          description: '200 response'
+          headers:
+            Access-Control-Allow-Origin:
+              type: 'string'
+            Access-Control-Allow-Methods:
+              type: 'string'
+            Access-Control-Allow-Headers:
+              type: 'string'
