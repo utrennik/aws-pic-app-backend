@@ -62,7 +62,7 @@ const validateProductData = (productData: any) => {
   }
 };
 
-const postProduct = async (productData: any) => {
+const post = async (productData: any) => {
   validateProductData(productData);
   const product: IProductData = createProduct(productData);
   if (!client) await connect();
@@ -74,4 +74,4 @@ const postProduct = async (productData: any) => {
   return product;
 };
 
-export { getAll, getById, postProduct };
+export { getAll, getById, post };

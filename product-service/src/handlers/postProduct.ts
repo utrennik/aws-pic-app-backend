@@ -1,5 +1,5 @@
 import { ValidationError } from './../errors/validationError';
-import { postProduct } from '../service/service';
+import { post } from '../service/service';
 import { IProduct } from '../models/types';
 
 const postProduct = async (event: any) => {
@@ -10,7 +10,7 @@ const postProduct = async (event: any) => {
 
     const productData = JSON.parse(event.body);
 
-    const result = await postProduct(productData);
+    const result = await post(productData);
 
     return {
       statusCode: 201,
