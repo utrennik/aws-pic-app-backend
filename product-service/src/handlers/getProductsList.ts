@@ -2,6 +2,8 @@ import { getAll } from '../service/service';
 import { IProduct } from '../models/types';
 
 const getProductsList = async (event: any) => {
+  console.log(`GET products: ${JSON.stringify(event)}`);
+
   const products: IProduct[] = await getAll();
 
   return {

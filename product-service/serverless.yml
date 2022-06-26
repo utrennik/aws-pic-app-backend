@@ -93,6 +93,17 @@ functions:
           path: 'products/{productId}'
           method: get
           cors: true
+
+  postProduct:
+    handler: src/handlers/postProduct.postProduct
+    #    The following are a few example events you can configure
+    #    NOTE: Please make sure to change your handler code to work with those events
+    #    Check the event documentation for details
+    events:
+      - http:
+          path: 'products/'
+          method: post
+          cors: true
   #        path: products
   #        method: GET
   #      - websocket: $connect

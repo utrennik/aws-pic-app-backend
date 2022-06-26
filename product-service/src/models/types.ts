@@ -3,5 +3,10 @@ export interface IProduct {
   title: string;
   description: string;
   price: number;
-  image: string;
+}
+
+export interface IProductData {
+  title: string;
+  description: string;
+  price: number;
 }

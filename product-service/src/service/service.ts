@@ -1,8 +1,7 @@
 import { Client } from 'pg';
-import { IProduct } from './../models/types';
+import { IProduct, IProductData } from './../models/types';
 import { NotFoundError } from '../errors/notFoundError';
 import { ConnectionError } from '../errors/connectionError';
-import products from '../mocks/products';
 
 const { PG_HOST, PG_PORT, PG_DATABASE, PG_USERNAME, PG_PASSWORD } = process.env;
 
@@ -51,4 +50,28 @@ const getById = async (id: string) => {
   return product;
 };
 
-export { getAll, getById };
+const createProduct = ({ title, description = '', price }) => {
+  const product: IProductData = { title, description, price };
+  return product;
+};
+
+const validateProductData = (productData: any) => {
+  const { title, description = '', price } = productData;
+  if (!title || typeof title !== 'string' || typeof description !== 'string' || isNaN(price) || price < 0) {
+    throw new Error('Invalid product data');
+  }
+};
+
+const postProduct = async (productData: any) => {
+  validateProductData(productData);
+  const product: IProductData = createProduct(productData);
+  if (!client) await connect();
+  await client.query('INSERT INTO products (title, description, price) VALUES ($1, $2, $3)', [
+    product.title,
+    product.description,
+    product.price,
+  ]);
+  return product;
+};
+
+export { getAll, getById, postProduct };
