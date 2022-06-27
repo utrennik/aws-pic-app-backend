@@ -9,4 +9,5 @@ export interface IProductData {
   title: string;
   description: string;
   price: number;
+  count?: number;
 }

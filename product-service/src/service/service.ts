@@ -17,37 +17,41 @@ const dbOptions = {
   connectionTimeoutMillis: 5000,
 };
 
-let client;
-
-const connect = async () => {
+const useDB = async (cb) => {
+  const client = new Client(dbOptions);
   try {
-    client = new Client(dbOptions);
     await client.connect();
-  } catch (error) {
-    throw new ConnectionError(error.message);
+    return await cb(client);
+  } catch (e) {
+    throw new ConnectionError(e.message);
+  } finally {
+    client.end();
   }
 };
 
 const getAll = async () => {
-  if (!client) await connect();
-  const { rows: products } = await client.query('SELECT * FROM products');
-  const { rows: stocks } = await client.query('SELECT * FROM stocks');
-  const result = products.map((product: IProduct) => {
-    const stock = stocks.find((stock: any) => stock.product_id === product.id);
-    return { ...product, count: stock.count };
+  return await useDB(async (client) => {
+    const { rows: products } = await client.query('SELECT * FROM products');
+    const { rows: stocks } = await client.query('SELECT * FROM stocks');
+    const result = products.map((product: IProduct) => {
+      const stock = stocks.find((stock: any) => stock.product_id === product.id);
+      if (!stock) return product;
+      return { ...product, count: stock.count };
+    });
+    return result;
   });
-  return result;
 };
 
 const getById = async (id: string) => {
-  if (!client) await connect();
-  const { rows: products } = await client.query('SELECT * FROM products WHERE id = $1', [id]);
-  if (!products.length) throw new NotFoundError(`Product with id ${id} not found`);
-  const { rows: stocks } = await client.query('SELECT * FROM stocks WHERE product_id = $1', [id]);
-  if (!stocks.length) throw new NotFoundError(`Stock info for product with id ${id} not found`);
-  const product = { ...products[0], count: stocks[0].count };
+  return await useDB(async (client) => {
+    const { rows: products } = await client.query('SELECT * FROM products WHERE id = $1', [id]);
+    if (!products.length) throw new NotFoundError(`Product with id ${id} not found`);
+    const { rows: stocks } = await client.query('SELECT * FROM stocks WHERE product_id = $1', [id]);
+    if (!stocks.length) return { ...products[0] };
+    const product = { ...products[0], count: stocks[0].count };
 
-  return product;
+    return product;
+  });
 };
 
 const createProduct = ({ title, description = '', price }) => {
@@ -65,13 +69,21 @@ const validateProductData = (productData: any) => {
 const post = async (productData: any) => {
   validateProductData(productData);
   const product: IProductData = createProduct(productData);
-  if (!client) await connect();
-  await client.query('INSERT INTO products (title, description, price) VALUES ($1, $2, $3)', [
-    product.title,
-    product.description,
-    product.price,
-  ]);
-  return product;
+
+  return await useDB(async (client) => {
+    const response = await client.query(
+      `INSERT INTO products (title, description, price) VALUES ($1, $2, $3) RETURNING id`,
+      [product.title, product.description, product.price]
+    );
+
+    const { id } = response.rows[0];
+
+    const count = productData.count || 0;
+
+    await client.query('INSERT INTO stocks (product_id, count) VALUES ($1, $2)', [id, count]);
+
+    return { ...product, id };
+  });
 };
 
 export { getAll, getById, post };
