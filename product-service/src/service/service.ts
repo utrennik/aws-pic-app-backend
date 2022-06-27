@@ -1,7 +1,8 @@
 import { Client } from 'pg';
-import { IProduct, IProductData } from './../models/types';
+import { PostError } from './../errors/postError';
 import { NotFoundError } from '../errors/notFoundError';
 import { ConnectionError } from '../errors/connectionError';
+import { IProduct, IProductData } from './../models/types';
 
 const { PG_HOST, PG_PORT, PG_DATABASE, PG_USERNAME, PG_PASSWORD } = process.env;
 
@@ -71,18 +72,23 @@ const post = async (productData: any) => {
   const product: IProductData = createProduct(productData);
 
   return await useDB(async (client) => {
-    const response = await client.query(
-      `INSERT INTO products (title, description, price) VALUES ($1, $2, $3) RETURNING id`,
-      [product.title, product.description, product.price]
-    );
+    await client.query(`BEGIN`);
 
-    const { id } = response.rows[0];
+    try {
+      const response = await client.query(
+        `INSERT INTO products (title, description, price) VALUES ($1, $2, $3) RETURNING id`,
+        [product.title, product.description, product.price]
+      );
+      const { id } = response.rows[0];
+      const count = productData.count || 0;
 
-    const count = productData.count || 0;
-
-    await client.query('INSERT INTO stocks (product_id, count) VALUES ($1, $2)', [id, count]);
-
-    return { ...product, id };
+      await client.query('INSERT INTO stocks (product_id, count) VALUES ($1, $2)', [id, count]);
+      await client.query(`COMMIT`);
+      return { ...product, id, count };
+    } catch (e) {
+      await client.query(`ROLLBACK`);
+      throw new PostError(e.message);
+    }
   });
 };
 
