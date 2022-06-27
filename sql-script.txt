@@ -1,0 +1,105 @@
+create table products (
+	id uuid primary key default uuid_generate_V4(),
+	title text not null,
+	description text,
+	price integer
+)
+
+create table stocks (
+	product_id uuid,
+	foreign key (product_id) references products (id),
+	count integer
+)
+
+
+create extension if not exists "uuid-ossp";
+
+insert into products (title, description, price) values
+(
+    'Fox',
+    'A wild fox',
+    999
+),
+(
+    'Hare',
+    'A wild hare',
+    20
+),
+(
+    'Deer',
+    'A wild deer',
+    25
+),
+(  
+	'Owl',
+	'A wild owl',
+    50
+),
+(   'Nut',
+	'A nut',
+    1
+),
+(	'Mushroom (violet)',
+	'A mushroom',
+    20
+),
+(	'Strawberry',
+	'A strawberry',
+    50
+),
+(
+	'Squirrel',
+	'A squirrel',
+    20
+ ),
+ (	'Hedgehog',
+    'A hedgehog',
+    50
+ ),
+ (
+ 	'Leaf',
+    'A leaf',
+    70
+)
+
+insert into stocks (product_id, count) values
+(
+'ec54f7cd-9711-4084-86c9-0aaf38ad6713',
+1
+),
+(
+'0fb908b5-7ec1-4ad2-a845-8611152b25c3',
+2
+),
+(
+'80933b2b-54a3-4b22-bdb7-b781c9d79c75',
+5
+),
+(
+'1d1391f5-1820-45e4-a499-2d0ef72b4c94',
+4
+),
+(
+'8c0b69ff-4ea3-44c0-aabe-1570b6267c27',
+5
+),
+(
+'69262994-170b-4ec9-b4e3-535636f0ca6e',
+15
+),
+(
+'38f8359c-2ac0-4aa8-ac3c-b7255e40a28d',
+3
+),
+(
+'3c1c1b42-b01f-47a9-be9b-e29cc2d3c32b',
+6
+),
+(
+'ee81d40f-3396-4472-8301-ca30b55cc634',
+9
+),
+(
+'66c4137f-ceec-4bfd-86ba-aa3559a75dad',
+2
+)
