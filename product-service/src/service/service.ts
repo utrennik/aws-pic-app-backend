@@ -1,3 +1,4 @@
+import { ValidationError } from './../errors/validationError';
 import { Client } from 'pg';
 import { PostError } from './../errors/postError';
 import { NotFoundError } from '../errors/notFoundError';
@@ -63,7 +64,7 @@ const createProduct = ({ title, description = '', price }) => {
 const validateProductData = (productData: any) => {
   const { title, description = '', price } = productData;
   if (!title || typeof title !== 'string' || typeof description !== 'string' || isNaN(price) || price < 0) {
-    throw new Error('Invalid product data');
+    throw new ValidationError('Invalid product data');
   }
 };
 
