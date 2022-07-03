@@ -1,16 +1,16 @@
 import { ParseError } from './../errors/postError';
 import AWS from 'aws-sdk';
 import csv from 'csv-parser';
-import fs from 'fs';
 
 import { REGION } from '../constants';
 
 const getFileStreamsFromRecords = async (records: any) => {
+  const awsS3 = new AWS.S3({ region: REGION });
   const objects = records.map((record) => {
-    const { s3 } = record;
-    const { bucket, key } = s3;
+    const bucket = record.s3.bucket.name;
+    const key = record.s3.object.key;
     const params = { Bucket: bucket, Key: key };
-    return s3.getObject(params).createReadStream();
+    return awsS3.getObject(params).createReadStream();
   });
 
   return objects;
@@ -19,7 +19,6 @@ const getFileStreamsFromRecords = async (records: any) => {
 const importFileParser = async (event: any) => {
   console.log('importFileParser: ', JSON.stringify(event));
   try {
-    const s3 = new AWS.S3({ region: REGION });
     const { records } = event;
     const streams = await getFileStreamsFromRecords(records);
 
