@@ -1,4 +1,4 @@
-import { FileOperationError } from './../errors/paramError copy';
+import { FileOperationError } from '../errors/FileOperationError';
 import { ParseError } from './../errors/postError';
 import AWS from 'aws-sdk';
 import csv from 'csv-parser';
@@ -47,36 +47,14 @@ const moveFileToParsed = async (records: any) => {
       Key: `${PARSED_KEY}${fileName}`,
     };
 
-    console.log(`COPY PARAMS: ${JSON.stringify(copyParams)}`);
-    await new Promise((res, rej) => {
-      s3.copyObject(copyParams, (err, data) => {
-        if (err) {
-          console.log(`COPY ERROR: ${JSON.stringify(err)}`);
-          rej(err);
-        }
-        res(data);
-        console.log(`COPY SUCCEEDED: ${JSON.stringify(data)}`);
-      });
-    });
+    await s3.copyObject(copyParams).promise();
 
     const deleteParams = {
       Bucket: bucket,
       Key: `${key}`,
     };
 
-    console.log(`DELETE PARAMS: ${JSON.stringify(deleteParams)}`);
-
-    await new Promise((res, rej) => {
-      s3.deleteObject(deleteParams, (err, data) => {
-        if (err) {
-          console.log(`ERROR DELETING FILE: ${JSON.stringify(err)}`);
-          rej(err);
-        }
-
-        res(data);
-        console.log(`DELETE SUCCEEDED: ${JSON.stringify(data)}`);
-      });
-    });
+    await s3.deleteObject(deleteParams).promise();
   });
 
   await Promise.all(promises);

@@ -1,5 +1,5 @@
 import AWS from 'aws-sdk';
-import { ParamError } from '@/errors/paramError';
+import { ParamError } from '../errors/paramError';
 import { REGION, BUCKET, UPLOADED_KEY } from '../constants';
 
 const CSV_CONTENT_TYPE = 'text/csv';
