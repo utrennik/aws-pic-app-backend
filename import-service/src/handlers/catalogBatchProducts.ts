@@ -1,31 +1,9 @@
-import AWS from 'aws-sdk';
-import { postAll } from '../db-service/db-service';
-import { IProduct } from './../../../product-service/src/models/types';
-import { REGION } from '../constants';
-
-const notifyAboutAddProducts = async (postedProducts: IProduct[]) => {
-  const sns = new AWS.SNS({ region: REGION });
-
-  const promises = postedProducts.map(async (product) => {
-    return sns
-      .publish({
-        MessageAttributes: {
-          title: {
-            DataType: 'String',
-            StringValue: product.title,
-          },
-        },
-        Subject: `New product added: ${product.title}`,
-        Message: JSON.stringify(product),
-        TopicArn: process.env.SNS_TOPIC_ARN,
-      })
-      .promise();
-  });
-
-  return Promise.all(promises);
-};
+import { postAll } from '../helpers/db-service';
+import notifyAboutAddProducts from '../helpers/notifyAboutAddProducts';
 
 const catalogBatchProducts = async (event: any) => {
+  console.log('Event', JSON.stringify(event));
+
   try {
     const products = event.Records.map((record) => JSON.parse(record.body));
 

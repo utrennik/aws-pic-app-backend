@@ -1,8 +1,8 @@
-import { ValidationError } from './../errors/validationError';
+import { ValidationError } from '../errors/validationError';
 import { Client } from 'pg';
 import { PostError } from '../errors/postError';
 import { ConnectionError } from '../errors/connectionError';
-import { IProductData } from './../models/types';
+import { IProductData } from '../models/types';
 
 const { PG_HOST, PG_PORT, PG_DATABASE, PG_USERNAME, PG_PASSWORD } = process.env;
 

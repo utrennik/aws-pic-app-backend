@@ -53,11 +53,6 @@ provider:
       Ref: SQSQueue
     SNS_TOPIC_ARN:
       Ref: SNSTopic
-    PG_HOST: pic-app-db.cfdwzosdekvm.eu-west-1.rds.amazonaws.com
-    PG_PORT: 5432
-    PG_DATABASE: postgres
-    PG_USERNAME: postgres
-    PG_PASSWORD: QZ9O2qShepolU3Kp9NOX
 
 functions:
   importProductsFile:
