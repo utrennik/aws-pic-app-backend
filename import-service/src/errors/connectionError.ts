@@ -1,11 +1,11 @@
-export class PostError extends Error {
+export class ConnectionError extends Error {
   public statusCode: number;
   public message: string;
   public name: string;
 
   constructor(message: string) {
     super(message);
-    this.name = 'PostError';
+    this.name = 'ConnectionError';
     this.statusCode = 500;
   }
 }
