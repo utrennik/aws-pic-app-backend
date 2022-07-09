@@ -1,11 +1,11 @@
-export class PostError extends Error {
+export class ValidationError extends Error {
   public statusCode: number;
   public message: string;
   public name: string;
 
   constructor(message: string) {
     super(message);
-    this.name = 'PostError';
-    this.statusCode = 500;
+    this.name = 'ValidationError';
+    this.statusCode = 400;
   }
 }

@@ -1,7 +1,8 @@
-import { FileOperationError } from '../errors/FileOperationError';
-import { ParseError } from './../errors/postError';
-import AWS from 'aws-sdk';
 import csv from 'csv-parser';
+import AWS from 'aws-sdk';
+import { FileOperationError } from '../errors/FileOperationError';
+import { ParseError } from '../errors/parseError';
+import { QueueError } from '../errors/queueError';
 import { REGION, PARSED_KEY } from '../constants';
 
 const getFileStreamsFromRecords = async (records: any) => {
@@ -60,6 +61,23 @@ const moveFileToParsed = async (records: any) => {
   await Promise.all(promises);
 };
 
+const sendToQueue = async (productsParsed) => {
+  const sqs = new AWS.SQS({ region: REGION });
+  const url = process.env.SQS_URL;
+
+  const promises = productsParsed.map(async (product) => {
+    const params = {
+      QueueUrl: url,
+      MessageBody: JSON.stringify(product),
+      DelaySeconds: 0,
+    };
+    await sqs.sendMessage(params).promise();
+    console.log(`Successfully sent product to queue: ${JSON.stringify(product)}`);
+  });
+
+  return Promise.all(promises);
+};
+
 const importFileParser = async (event: any) => {
   console.log('importFileParser: ', JSON.stringify(event));
   try {
@@ -67,7 +85,7 @@ const importFileParser = async (event: any) => {
     const streams = await getFileStreamsFromRecords(records);
     let parsedRecords;
     try {
-      parsedRecords = await Promise.all(streams.map(parseStream));
+      parsedRecords = await (await Promise.all(streams.map(parseStream))).flat();
       console.log('parsedRecords: ', JSON.stringify(parsedRecords));
     } catch (e) {
       throw new ParseError(e.message);
@@ -77,6 +95,14 @@ const importFileParser = async (event: any) => {
       await moveFileToParsed(records);
     } catch (e) {
       throw new FileOperationError(e.message);
+    }
+
+    try {
+      await sendToQueue(parsedRecords);
+      console.log(`Successfully sent ${parsedRecords.length} products to queue`);
+    } catch (e) {
+      console.log(`Error sending products to queue: ${e.message}`);
+      throw new QueueError(e.message);
     }
 
     return {
