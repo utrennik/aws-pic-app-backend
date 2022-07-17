@@ -24,6 +24,7 @@ const catalogBatchProducts = async (event: any) => {
       body: JSON.stringify(result, null, 2),
     };
   } catch (error) {
+    console.log('catalogBatchProducts error: ', error);
     return {
       statusCode: error.statusCode || 500,
       headers: { 'Access-Control-Allow-Origin': '*' },
