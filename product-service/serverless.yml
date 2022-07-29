@@ -71,6 +71,7 @@ provider:
 #    - include-me-dir/**
 #  Define function environment variables here
 
+
 functions:
   getProducts:
     handler: src/handlers/getProductsList.getProductsList
@@ -82,6 +83,10 @@ functions:
           path: 'products/'
           method: get
           cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:eu-west-1:033340863456:userpool/eu-west-1_sD3Y9aYWJ
+            
 
   getProductsById:
     handler: src/handlers/getProductsById.getProductsById
