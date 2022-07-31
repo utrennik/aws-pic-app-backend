@@ -40,6 +40,8 @@ provider:
   stage: dev
   region: eu-west-1
 
+
+
 # you can add statements to the Lambda function's IAM Role here
 #  iam:
 #    role:
@@ -62,6 +64,7 @@ provider:
 #  environment:
 #    variable1: value1
 
+
 # you can add packaging information here
 #package:
 #  patterns:
@@ -83,11 +86,7 @@ functions:
           path: 'products/'
           method: get
           cors: true
-          authorizer:
-            name: authorizer
-            arn: arn:aws:cognito-idp:eu-west-1:033340863456:userpool/eu-west-1_sD3Y9aYWJ
             
-
   getProductsById:
     handler: src/handlers/getProductsById.getProductsById
     #    The following are a few example events you can configure
