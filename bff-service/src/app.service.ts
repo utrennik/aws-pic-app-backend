@@ -24,14 +24,16 @@ export class AppService {
       body,
       headers: {...headers, host: ''} as any
     };
+
     try {
       const response = await this.httpService.request(requestConfig).toPromise();
-      res.status(response.status).send(response.data);
+      const { status, headers, data } = response;
+      res.status(status).set({ ...headers }).send(data);
     } catch (e) {
-      const statusCode = e.response ? e.response.status : HttpStatus.INTERNAL_SERVER_ERROR;
-      res.status(statusCode).send(e.message);
-      return;
-    }
+        const status = e.response ? e.response.status : HttpStatus.INTERNAL_SERVER_ERROR
+        res.status(status).send(e.message);
+        return;
+      }
   }
 
   private static getServiceNameFromUrl(url: string): string {
