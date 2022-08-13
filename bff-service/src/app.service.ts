@@ -1,10 +1,12 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
-import { Request, response, Response } from 'express';
+import { Request, Response, response } from 'express';
 import { HttpService } from '@nestjs/axios';
+import { CACHED_SERVICE, CACHE_TIMEOUT_MILLIS } from './constants'
 
 @Injectable()
 export class AppService {
   constructor(private readonly httpService: HttpService) { }
+
   async processRequest(req: Request, res: Response): Promise<void> {
 
     const serviceName = AppService.getServiceNameFromUrl(req.url);
@@ -22,18 +24,32 @@ export class AppService {
       method,
       url: `${serviceUrl}${url}`,
       body,
-      headers: {...headers, host: ''} as any
+      headers: { ...headers, host: '' } as any
     };
-
+    
     try {
-      const response = await this.httpService.request(requestConfig).toPromise();
-      const { status, headers, data } = response;
-      res.status(status).set({ ...headers }).send(data);
-    } catch (e) {
-        const status = e.response ? e.response.status : HttpStatus.INTERNAL_SERVER_ERROR
-        res.status(status).send(e.message);
-        return;
+
+      const cachedData = AppService.getCachedData(method, url);
+      
+      if (cachedData) {
+        const response = await this.httpService.request(requestConfig).toPromise();
+        const { status, headers, data } = response;
+
+        res.status(status).set({ ...headers }).send(data);
+      } else { 
+        const response = await this.httpService.request(requestConfig).toPromise();
+        const { status, headers, data } = response;
+
+        AppService.setCachedData(data);
+        
+        res.status(status).set({ ...headers }).send(data);
       }
+
+    } catch (e) {
+      const status = e.response ? e.response.status : HttpStatus.INTERNAL_SERVER_ERROR
+      res.status(status).send(e.message);
+      return;
+    }
   }
 
   private static getServiceNameFromUrl(url: string): string {
@@ -46,4 +62,23 @@ export class AppService {
 
     return baseUrlWithoutParams;
   }
+
+  private static cachedData: { data: any, timestamp: number } = { data: null, timestamp: 0 };
+
+  private static getCachedData(method: string, url: string): any {
+    if (!(method === 'GET' && url === `/${CACHED_SERVICE}`)) {
+      return null;
+    }
+
+    const isCacheExpired = Date.now() - AppService.cachedData.timestamp > CACHE_TIMEOUT_MILLIS;
+
+    return isCacheExpired ? null : AppService.cachedData.data;
+
+  };
+
+  private static setCachedData(data: any) { 
+    AppService.cachedData.data = data;
+    AppService.cachedData.timestamp = Date.now();
+  }
 }
+;
