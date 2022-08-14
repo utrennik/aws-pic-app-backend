@@ -29,18 +29,17 @@ export class AppService {
     
     try {
 
-      const cachedData = AppService.getCachedData(method, url);
+      const cachedData = AppService.isCacheableRequest(method, url) && AppService.getCachedData();
       
       if (cachedData) {
-        const response = await this.httpService.request(requestConfig).toPromise();
-        const { status, headers, data } = response;
+        const { status, headers, data } = cachedData;
 
         res.status(status).set({ ...headers }).send(data);
       } else { 
         const response = await this.httpService.request(requestConfig).toPromise();
         const { status, headers, data } = response;
 
-        AppService.setCachedData(data);
+        AppService.isCacheableRequest(method, url) && AppService.setCachedData({ status, headers, data });
         
         res.status(status).set({ ...headers }).send(data);
       }
@@ -63,22 +62,27 @@ export class AppService {
     return baseUrlWithoutParams;
   }
 
-  private static cachedData: { data: any, timestamp: number } = { data: null, timestamp: 0 };
+  private static cachedData: { data: any, headers: any, status: string, timestamp: number } = { data: null, headers: {}, status: '', timestamp: 0 };
 
-  private static getCachedData(method: string, url: string): any {
-    if (!(method === 'GET' && url === `/${CACHED_SERVICE}`)) {
-      return null;
-    }
-
+  private static getCachedData(): any {
     const isCacheExpired = Date.now() - AppService.cachedData.timestamp > CACHE_TIMEOUT_MILLIS;
+    const isCached = Boolean(AppService.cachedData.data);
 
-    return isCacheExpired ? null : AppService.cachedData.data;
+    if (!isCached || isCacheExpired) return null;
+
+    return AppService.cachedData;
 
   };
 
-  private static setCachedData(data: any) { 
+  private static setCachedData({status, headers, data }: any): void { 
+    if(status >= 400) return;
+    AppService.cachedData.status = status;
+    AppService.cachedData.headers = headers;
     AppService.cachedData.data = data;
     AppService.cachedData.timestamp = Date.now();
   }
+
+  private static isCacheableRequest(method: string, url: string) {
+    return (method === 'GET' && url === `/${CACHED_SERVICE}`)
+  }
 }
-;
