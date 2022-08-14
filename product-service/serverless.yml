@@ -41,6 +41,7 @@ provider:
   region: eu-west-1
 
 
+
 # you can add statements to the Lambda function's IAM Role here
 #  iam:
 #    role:

@@ -22,10 +22,12 @@ export class AppService {
     // with host header doesn't work with axios from localhost
     const requestConfig = {
       method,
-      url: `${serviceUrl}${url}`,
+      url: AppService.generateReqerstUrl(serviceUrl, url),
       body,
       headers: { ...headers, host: '' } as any
     };
+
+    console.log(`GENERATED URL: ${requestConfig.url}`)
     
     try {
 
@@ -60,6 +62,12 @@ export class AppService {
     const baseUrlWithoutParams = baseUrl.split('?')[0];
 
     return baseUrlWithoutParams;
+  }
+
+  private static generateReqerstUrl(serviceUrl: string, url: string): string {
+    const serviceUrlPart = AppService.getBaseUrlWithoutParams(url);
+    const restUrl = url.replace(`/${serviceUrlPart}`, '');
+    return `${serviceUrl}${restUrl}`;
   }
 
   private static cachedData: { data: any, headers: any, status: string, timestamp: number } = { data: null, headers: {}, status: '', timestamp: 0 };
