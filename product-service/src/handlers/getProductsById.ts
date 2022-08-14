@@ -13,8 +13,8 @@ const getProductsById = async (event: any) => {
     };
   } catch (error) {
     return {
-      statusCode: error.statusCode || 500,
-      body: JSON.stringify(error.message),
+      statusCode: 404,
+      body: error.message,
     };
   }
 };

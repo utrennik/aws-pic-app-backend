@@ -54,7 +54,6 @@ provider:
     SNS_TOPIC_ARN:
       Ref: SNSTopic    
 
-
 functions:
   importProductsFile:
     handler: src/handlers/importProductsFile.importProductsFile

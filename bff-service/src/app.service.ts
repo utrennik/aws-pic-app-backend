@@ -26,8 +26,6 @@ export class AppService {
       body,
       headers: { ...headers, host: '' } as any
     };
-
-    console.log(`GENERATED URL: ${requestConfig.url}`)
     
     try {
 
@@ -37,7 +35,7 @@ export class AppService {
         const { status, headers, data } = cachedData;
 
         res.status(status).set({ ...headers }).send(data);
-      } else { 
+      } else {
         const response = await this.httpService.request(requestConfig).toPromise();
         const { status, headers, data } = response;
 
