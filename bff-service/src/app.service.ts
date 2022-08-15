@@ -46,7 +46,7 @@ export class AppService {
 
     } catch (e) {
       const status = e.response ? e.response.status : HttpStatus.INTERNAL_SERVER_ERROR
-      res.status(status).send(e.message);
+      res.status(status).send(e.response.data);
       return;
     }
   }
