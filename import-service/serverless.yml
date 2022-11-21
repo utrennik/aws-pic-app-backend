@@ -52,7 +52,7 @@ provider:
     SQS_URL:
       Ref: SQSQueue
     SNS_TOPIC_ARN:
-      Ref: SNSTopic
+      Ref: SNSTopic    
 
 functions:
   importProductsFile:

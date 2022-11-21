@@ -3,6 +3,7 @@ export interface IProduct {
   title: string;
   description: string;
   price: number;
+  imageUrl?: string
 }
 
 export interface IProductData {
@@ -10,4 +11,5 @@ export interface IProductData {
   description: string;
   price: number;
   count?: number;
+  imageUrl: string
 }

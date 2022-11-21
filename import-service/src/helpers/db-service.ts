@@ -45,6 +45,7 @@ const postAll = async (productData: IProductData[]) => {
       description: item.description,
       price: item.price,
       count: item.count || 0,
+      imageUrl: item.imageUrl || '',
     };
   });
 
@@ -53,8 +54,8 @@ const postAll = async (productData: IProductData[]) => {
       await client.query(`BEGIN`);
       try {
         const response = await client.query(
-          `INSERT INTO products (title, description, price) VALUES ($1, $2, $3) RETURNING id`,
-          [product.title, product.description, product.price]
+          `INSERT INTO products (title, description, price, imageUrl) VALUES ($1, $2, $3, $4) RETURNING id`,
+          [product.title, product.description, product.price, product.imageUrl]
         );
         const { id } = response.rows[0];
         await client.query('INSERT INTO stocks (product_id, count) VALUES ($1, $2)', [id, product.count]);

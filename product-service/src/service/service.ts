@@ -56,8 +56,8 @@ const getById = async (id: string) => {
   });
 };
 
-const createProduct = ({ title, description = '', price }) => {
-  const product: IProductData = { title, description, price };
+const createProduct = ({ title, description = '', price, imageUrl = '' }) => {
+  const product: IProductData = { title, description, price, imageUrl };
   return product;
 };
 
@@ -78,7 +78,7 @@ const post = async (productData: any) => {
     try {
       const response = await client.query(
         `INSERT INTO products (title, description, price) VALUES ($1, $2, $3) RETURNING id`,
-        [product.title, product.description, product.price]
+        [product.title, product.description, product.price, product.imageUrl]
       );
       const { id } = response.rows[0];
       const count = productData.count || 0;
